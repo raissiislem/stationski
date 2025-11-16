@@ -2,7 +2,9 @@ package tn.esprit.stationski.services.implementations;
 
 import org.springframework.stereotype.Service;
 import tn.esprit.stationski.entities.Cours;
+import tn.esprit.stationski.entities.Inscription;
 import tn.esprit.stationski.entities.Moniteur;
+import tn.esprit.stationski.entities.Support;
 import tn.esprit.stationski.repositories.CoursRepository;
 import tn.esprit.stationski.repositories.MoniteurRepository;
 import tn.esprit.stationski.services.interfaces.IMoniteurInterface;
@@ -45,19 +47,32 @@ public class MoniteurServices implements IMoniteurInterface {
         moniteurRepository.deleteById(numMoniteur);
     }
     public Moniteur addInstructorAndAssignToCourse(Moniteur moniteur, Long numCourse) {
-        // 1. Retrieve the course
-        Cours cours = coursRepository.findById(numCourse)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + numCourse));
+        Cours cours = coursRepository.findById(numCourse).orElseThrow();
 
-        // 2. Initialize Moniteur's course list if null
         if (moniteur.getCours() == null) {
             moniteur.setCours(new ArrayList<>());
         }
 
-        // 3. Assign the course to the moniteur
         moniteur.getCours().add(cours);
-
 
         return moniteurRepository.save(moniteur);
     }
+    public List<Integer> numWeeksCourseOfInstructorBySupport(Long numInstructor, Support support) {
+        Moniteur moniteur = moniteurRepository.findById(numInstructor).orElseThrow();
+        List<Integer> weeks = new ArrayList<>();
+
+        if (moniteur.getCours() != null) {
+            for (Cours cours : moniteur.getCours()) {
+                if (cours.getSupport() == support && cours.getInscriptions() != null) {
+                    for (Inscription insc : cours.getInscriptions()) {
+                        weeks.add(insc.getNumSemaine());
+                    }
+                }
+            }
+        }
+
+        return weeks.stream().distinct().sorted().toList();
+    }
+
+
 }

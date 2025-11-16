@@ -7,9 +7,11 @@ import tn.esprit.stationski.entities.TypeAbonnement;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface AbonnementRepository extends JpaRepository<Abonnement, Long> {
-    List<Abonnement> findByTypeAboOrderByDateDebut(TypeAbonnement typeAbonnement);
+    Set<Abonnement> findByTypeAboOrderByDateDebut(TypeAbonnement typeAbonnement);
     List<Abonnement> findByDateDebutBetween(LocalDate startDate, LocalDate endDate);
+
 }
